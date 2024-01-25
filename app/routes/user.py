@@ -1,5 +1,5 @@
 from flask import jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app import db, app
 
 @app.route('/')
@@ -7,17 +7,21 @@ def hello():
     return "Hello"
 
 @app.route('/get_users', methods=['GET'])
+@jwt_required()
 def get_users():
-    user_details=[]
-    users=db.jwt_database.find()
-    for user in users:
-        details={
-            "username":user["username"],
-            "email":user["email"],
-            "password":user["password"]
-        }
-        user_details.append(details)
-    return user_details
+    claim= get_jwt()
+    if claim.get('role')=="admin":
+        user_details=[]
+        users=db.jwt_database.find()
+        for user in users:
+            details={
+                "username":user["username"],
+                "email":user["email"],
+                "password":user["password"]
+            }
+            user_details.append(details)
+        return jsonify(user_details)
+    return jsonify({"Error": "Yor are not authorized to access this"}),401
 
 
 
@@ -39,3 +43,11 @@ def whoami():
             }),200
     else:
         jsonify({"error":"user not found"})
+
+
+
+@app.route('/get_claims', methods=['GET'])
+@jwt_required()
+def get_claims():
+    claims= get_jwt()
+    return jsonify({"message":"success","claim":claims})

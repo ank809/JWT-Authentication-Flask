@@ -23,4 +23,12 @@ def invalid_token_callback(error):
 def missing_token_callback(error):
     return jsonify({"Error":"Request does not contain valid token", "error":"Unauthorized token"}),401
 
+
+# defining additional claims
+@jwt.additional_claims_loader
+def add_claims(identity):
+    if identity=="Ashish":
+        return {"role":"admin"}
+    return {"role":"users"}
+
 from app.routes import user, auth
