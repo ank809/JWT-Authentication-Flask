@@ -5,15 +5,18 @@ from flask_jwt_extended import JWTManager
 from config import SECRET_KEY, MONGO_URI, JWT_SECRET_KEY
 
 app= Flask(__name__)
+jwt= JWTManager(app)
+userCount=0
 
 app.config['SECRET_KEY']=SECRET_KEY
 app.config['MONGO_URI']=MONGO_URI
 app.config['JWT_SECRET_KEY']=JWT_SECRET_KEY
 app.config['JWT_ACCESS_TOKEN_EXPIRES']=timedelta(minutes=5)
 app.config['JWT_REFRESH_TOKEN_EXPIRES']=timedelta(minutes=15)
+
 mongo=PyMongo(app)
 revoked_tokens_db= mongo.db['revoked_tokens']
-jwt= JWTManager(app)
+
 
 @jwt.user_lookup_loader
 def user_lookup_callback(jwt_header, jwt_data):

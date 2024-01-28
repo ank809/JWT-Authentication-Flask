@@ -2,13 +2,16 @@ from flask import jsonify, request
 from flask_jwt_extended import ( jwt_required, 
                         get_jwt_identity, get_jwt, 
                         create_access_token, 
-                        decode_token, get_jti)
+                        decode_token)
 from app import mongo, app, revoked_tokens_db
 from datetime import datetime
 
+
 @app.route('/')
 def hello():
-    return "Hello"
+    return {
+        "Message":"Hello",
+    }
 
 @app.route('/get_users', methods=['GET'])
 @jwt_required()
@@ -30,7 +33,7 @@ def get_users():
 @app.route('/protected', methods=['GET'])
 @jwt_required()
 def protected():
-    current_user= get_jwt_identity
+    current_user= get_jwt_identity()
     return jsonify(logged_in_as=current_user),200
 
 @app.route('/who_am_i', methods=['GET'])
